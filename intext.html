@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Floating Mood Blobs</title>
+<style>
+html, body {
+  margin:0; padding:0; height:100%; overflow:hidden;
+  background: #0b0b0b; transition: background 1.2s ease;
+}
+canvas { display:block; touch-action:none; }
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<script>
+/* =========================
+   CANVAS SETUP
+========================= */
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+function resize(){ canvas.width=innerWidth; canvas.height=innerHeight; }
+resize(); addEventListener("resize", resize);
+const lerp=(a,b,t)=>a+(b-a)*t;
+
+/* =========================
+   COLOR UTILITIES
+========================= */
+const hexToRgb=h=>{ const n=parseInt(h.slice(1),16); return {r:n>>16,g:(n>>8)&255,b:n&255}; };
+const rgbStr=c=>`rgb(${c.r|0},${c.g|0},${c.b|0})`;
+const lerpRGB=(a,b,t)=>({r:lerp(a.r,b.r,t),g:lerp(a.g,b.g,t),b:lerp(a.b,b.b,t)});
+
+/* =========================
+   THEMES
+========================= */
+const themes = {
+  Calm: { bg:["#cfe9ff","#1b2b3a"], particle:"#7dc0fc" },
+  Joy: { bg:["#fff1a8","#3a2b12"], particle:"#facc15" },
+  Love: { bg:["#ffd6df","#3a0f1a"], particle:"#fb7185" },
+  Mystery: { bg:["#e6d9ff","#1c132f"], particle:"#a78bfa" }
+};
+let bgCurrent = themes.Calm.bg.map(hexToRgb);
+let bgTarget  = themes.Calm.bg.map(hexToRgb);
+
+/* =========================
+   PARTICLES
+========================= */
+class Particle{
+  constructor(x,y,color){
+    this.x=x; this.y=y; this.vx=(Math.random()-0.5)*0.25;
+    this.vy=-Math.random()*0.5-0.1; this.life=Math.random()*0.6+0.4;
+    this.color=hexToRgb(color); this.target=hexToRgb(color);
+    this.size=Math.random()*2+1.5;
+  }
+  morph(color){ this.target=hexToRgb(color); }
+  update(){ 
+    this.x+=this.vx; this.y+=this.vy; 
+    this.color=lerpRGB(this.color,this.target,0.05);
+    this.life-=0.0025;
+    if(this.life<=0){
+      this.reset();
+    }
+  }
+  reset(){
+    this.x=Math.random()*canvas.width;
+    this.y=canvas.height+Math.random()*60;
+    this.vx=(Math.random()-0.5)*0.25;
+    this.vy=-Math.random()*0.5-0.1;
+    this.life=Math.random()*0.6+0.4;
+  }
+  draw(){ 
+    ctx.globalAlpha=this.life; 
+    ctx.fillStyle=rgbStr(this.color); 
+    ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill(); 
+    ctx.globalAlpha=1; 
+  }
+}
+const MAX_PARTICLES=180;
+let particles=[];
+for(let i=0;i<MAX_PARTICLES;i++) particles.push(new Particle(Math.random()*canvas.width,canvas.height*Math.random(),themes.Calm.particle));
+let particleColor = themes.Calm.particle;
+
+/* =========================
+   HEART SYSTEM
+========================= */
+let lastHeart = 0;
+function spawnHeart(){
+  const now=performance.now();
+  if(now-lastHeart<4000) return; 
+  lastHeart=now;
+  const cx=canvas.width/2, cy=canvas.height/2;
+  for(let t=0;t<Math.PI*2;t+=0.09){
+    const x=16*Math.pow(Math.sin(t),3);
+    const y=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+    const p=new Particle(cx+x*8,cy+y*8,themes.Love.particle);
+    p.size=2.6; particles.push(p);
+  }
+}
+
+/* =========================
+   BLOBS
+========================= */
+class Blob{
+  constructor(x,y,r,color,label){
+    this.x=x; this.y=y; this.vx=(Math.random()-0.5)*0.3; this.vy=(Math.random()-0.5)*0.3;
+    this.r=r; this.baseR=r; this.targetR=r; this.color=color; this.label=label;
+    this.drag=false; this.sel=false; this.pulse=0;
+  }
+  orbit(){
+    const cx=canvas.width/2, cy=canvas.height/2;
+    const dx=this.x-cx, dy=this.y-cy;
+    const d=Math.hypot(dx,dy)||1;
+    const tx=-dy/d, ty=dx/d;
+    this.vx+=tx*0.002; this.vy+=ty*0.002;
+    this.vx+=(-dx/d)*0.0006; this.vy+=(-dy/d)*0.0006;
+  }
+  update(idle){
+    if(idle&&!this.drag) this.orbit();
+    this.vx*=0.995; this.vy*=0.995;
+    this.x+=this.vx; this.y+=this.vy;
+    if(this.sel && this.label==="Love"){ this.pulse+=0.08; this.r=this.targetR+Math.sin(this.pulse)*1.2; }
+    else this.r=lerp(this.r,this.targetR,0.08);
+    const p=this.r; this.x=Math.max(p,Math.min(canvas.width-p,this.x));
+    this.y=Math.max(p,Math.min(canvas.height-p,this.y));
+  }
+  draw(){
+    ctx.save(); ctx.shadowBlur=30; ctx.shadowColor=this.color;
+    ctx.fillStyle=this.color; ctx.beginPath();
+    ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.fillStyle="#ffffffcc"; ctx.font="15px sans-serif"; ctx.textAlign="center";
+    ctx.fillText(this.label,this.x,this.y+5);
+  }
+  hit(px,py){ return Math.hypot(px-this.x,py-this.y)<this.r; }
+}
+
+/* =========================
+   SPRINGS
+========================= */
+class Spring{
+  constructor(a,b){ this.a=a; this.b=b; this.l=180; }
+  update(){
+    const dx=this.b.x-this.a.x; const dy=this.b.y-this.a.y;
+    const d=Math.hypot(dx,dy)||0.01; const f=(d-this.l)*0.0006;
+    const nx=dx/d, ny=dy/d;
+    if(!this.a.drag){ this.a.vx+=f*nx; this.a.vy+=f*ny; }
+    if(!this.b.drag){ this.b.vx-=f*nx; this.b.vy-=f*ny; }
+  }
+  draw(){ ctx.strokeStyle="rgba(255,255,255,0.06)"; ctx.beginPath(); ctx.moveTo(this.a.x,this.a.y); ctx.lineTo(this.b.x,this.b.y); ctx.stroke(); }
+}
+
+/* =========================
+   COLLISION
+========================= */
+function resolveCollisions(blobs){
+  for(let i=0;i<blobs.length;i++){
+    for(let j=i+1;j<blobs.length;j++){
+      const a=blobs[i], b=blobs[j];
+      const dx=b.x-a.x, dy=b.y-a.y;
+      let dist=Math.hypot(dx,dy); if(dist<0.001) dist=0.001;
+      const min=a.r+b.r;
+      if(dist<min){
+        const nx=dx/dist, ny=dy/dist;
+        const overlap=(min-dist)*0.5;
+        if(!a.drag){a.x-=nx*overlap; a.y-=ny*overlap;} 
+        if(!b.drag){b.x+=nx*overlap; b.y+=ny*overlap;}
+        const impulse=0.03;
+        if(!a.drag){ a.vx-=nx*impulse; a.vy-=ny*impulse; }
+        if(!b.drag){ b.vx+=nx*impulse; b.vy+=ny*impulse; }
+      }
+    }
+  }
+}
+
+/* =========================
+   SETUP
+========================= */
+const labels=["Calm","Joy","Love","Mystery"];
+const colors=["#7dc0fc","#facc15","#fb7185","#a78bfa"];
+const blobs=[]; const cx=canvas.width/2, cy=canvas.height/2;
+const ring=Math.min(canvas.width,canvas.height)/4;
+labels.forEach((l,i)=>{
+  const a=i/labels.length*Math.PI*2;
+  blobs.push(new Blob(cx+Math.cos(a)*ring,cy+Math.sin(a)*ring,42,colors[i],l));
+});
+const springs=[];
+for(let i=0;i<blobs.length;i++)
+for(let j=i+1;j<blobs.length;j++)
+springs.push(new Spring(blobs[i],blobs[j]));
+
+/* =========================
+   INTERACTION
+========================= */
+let active=null;
+canvas.addEventListener("pointerdown",e=>{
+  const r=canvas.getBoundingClientRect();
+  const x=e.clientX-r.left, y=e.clientY-r.top;
+  blobs.forEach(b=>{ b.sel=false; b.targetR=b.baseR; });
+  for(const b of blobs){
+    if(b.hit(x,y)){
+      active=b; b.drag=true; b.sel=true; b.targetR=b.baseR*0.85;
+      bgTarget = themes[b.label].bg.map(hexToRgb);
+      particleColor = themes[b.label].particle;
+      particles.forEach(p=>p.morph(particleColor));
+      if(b.label==="Love") spawnHeart();
+      break;
+    }
+  }
+});
+canvas.addEventListener("pointermove",e=>{
+  if(!active) return;
+  const r=canvas.getBoundingClientRect();
+  active.x=lerp(active.x,e.clientX-r.left,0.3);
+  active.y=lerp(active.y,e.clientY-r.top,0.3);
+});
+canvas.addEventListener("pointerup",()=>{ if(active) active.drag=false; active=null; });
+
+/* =========================
+   LOOP
+========================= */
+function animate(){
+  // BG transition
+  bgCurrent[0]=lerpRGB(bgCurrent[0],bgTarget[0],0.025);
+  bgCurrent[1]=lerpRGB(bgCurrent[1],bgTarget[1],0.025);
+  document.body.style.background=`radial-gradient(circle at center,${rgbStr(bgCurrent[0])},${rgbStr(bgCurrent[1])})`;
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  springs.forEach(s=>s.update());
+  resolveCollisions(blobs);
+  springs.forEach(s=>s.draw());
+
+  const idle=!active;
+  blobs.forEach(b=>{ b.update(idle); b.draw(); });
+
+  // Particle system
+  particles.forEach(p=>{p.update(); p.draw();});
+
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>

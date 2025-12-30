@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cute Pink Homepage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #ffe1f0, #ff4b8b);
+      color: #3b0023;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .page-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 1100px;
+      height: 100vh;
+      padding: 24px 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      position: relative;
+      width: 100%;
+      max-width: 720px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 24px;
+      padding: 32px 24px 40px;
+      margin: 0 auto;
+      z-index: 3;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow:
+        0 18px 35px rgba(255, 0, 102, 0.24),
+        0 0 25px rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(16px);
+      opacity: 0;
+      transform: translateY(10px);
+      animation:
+        card-fade-in 0.8s ease-out forwards,
+        card-float 10s ease-in-out infinite alternate;
+    }
+
+    @keyframes card-fade-in {
+      0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes card-float {
+      0% {
+        transform: translateY(0);
+      }
+      100% {
+        transform: translateY(-6px);
+      }
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      position: relative;
+    }
+
+    header h1 {
+      font-size: 2.4rem;
+      letter-spacing: 1px;
+      transition: transform 0.2s ease;
+    }
+
+    header h1:hover {
+      transform: translateY(-2px);
+    }
+
+    .bear-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    header img.bear-gif {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 50%;
+      transition: transform 0.35s ease;
+      transform-origin: bottom center;
+    }
+
+    header img.bear-gif:hover {
+      transform: translateY(-4px) rotate(-5deg) scale(1.05);
+    }
+
+    .meow-bubble {
+      position: absolute;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 999px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+      font-size: 0.85rem;
+      color: #3b0023;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .meow-bubble::after {
+      content: "";
+      position: absolute;
+      bottom: -7px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .meow-bubble.show {
+      animation: meow-pop 0.9s ease-out forwards;
+    }
+
+    @keyframes meow-pop {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, 8px) scale(0.7);
+      }
+      30% {
+        opacity: 1;
+        transform: translate(-50%, -4px) scale(1.03);
+      }
+      55% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+      }
+      80% {
+        opacity: 1;
+        transform: translate(-50%, -2px) scale(1.01);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -6px) scale(0.95);
+      }
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+      opacity: 0.9;
+    }
+
+    .primary-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 0 auto 10px;
+      padding: 12px 32px;
+      border-radius: 999px;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      background: linear-gradient(120deg, #ff7aa2, #ff2b7a);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      box-shadow: 0 12px 24px rgba(255, 43, 122, 0.45);
+      text-decoration: none;
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        opacity 0.18s ease;
+      overflow: hidden;
+    }
+
+    .primary-btn span.arrow {
+      display: inline-block;
+      transition: transform 0.2s ease;
+    }
+
+    .primary-btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.6), transparent 55%);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 18px 30px rgba(255, 43, 122, 0.6);
+      opacity: 0.98;
+    }
+
+    .primary-btn:hover::before {
+      opacity: 1;
+    }
+
+    .primary-btn:hover .arrow {
+      transform: translateX(4px);
+    }
+
+    .primary-btn:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 8px 16px rgba(255, 43, 122, 0.35);
+      opacity: 0.94;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    /* VERTICAL SIDE COLUMNS WITH DEEP PINK SECTION */
+    .side-column {
+      position: absolute;
+      top: 24px;
+      bottom: 24px;
+      width: 170px;
+      pointer-events: none;
+      z-index: 1;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .side-column.left {
+      left: 5px;
+    }
+
+    .side-column.right {
+      right: 5px;
+    }
+
+    .side-section {
+      position: relative;
+      width: 100%;
+      border-radius: 24px;
+      background: #ff2b7a;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.55);
+      overflow: hidden;
+    }
+
+    .scroll-viewport {
+      position: absolute;
+      inset: 10px;
+      border-radius: 18px;
+      overflow: hidden;
+      z-index: 2;
+    }
+
+    .scroll-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 200%;
+      display: flex;
+      flex-direction: column;
+      will-change: transform;
+      animation: scroll-vertical 26s linear infinite;
+    }
+
+    .scroll-track.reverse {
+      animation-direction: reverse;
+      animation-duration: 30s;
+      animation-delay: -4s;
+    }
+
+    .meme {
+      width: 100%;
+      flex: 0 0 25vh;
+    }
+
+    .meme img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 16px;
+    }
+
+    @keyframes scroll-vertical {
+      0% {
+        transform: translate3d(0, 0, 0);
+      }
+      100% {
+        transform: translate3d(0, -50%, 0);
+      }
+    }
+
+    /* HORIZONTAL STRIPS WITH DEEP PINK SECTION (mobile) */
+    .meme-strip-shell {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 90px;
+      display: none;
+      z-index: 1;
+      padding-inline: 12px;
+      pointer-events: none;
+    }
+
+    .meme-strip-shell.top {
+      top: 0;
+    }
+
+    .meme-strip-shell.bottom {
+      bottom: 0;
+    }
+
+    .meme-strip-section {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      background: #ff2b7a;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.55);
+      overflow: hidden;
+    }
+
+    .meme-strip {
+      position: absolute;
+      inset: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .meme-strip-inner {
+      display: flex;
+      width: max-content;
+      animation: marquee-horizontal 20s linear infinite;
+      will-change: transform;
+    }
+
+    .meme-strip.bottom .meme-strip-inner {
+      animation-duration: 24s;
+      animation-direction: reverse;
+      animation-delay: -3s;
+    }
+
+    .meme-strip-item {
+      flex: 0 0 auto;
+      width: 120px;
+      height: 74px;
+    }
+
+    .meme-strip-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    @keyframes marquee-horizontal {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .side-column {
+        width: 145px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      body {
+        overflow-y: auto;
+      }
+
+      .page-wrapper {
+        align-items: flex-start;
+        height: auto;
+        padding-top: 110px;
+        padding-bottom: 110px;
+      }
+
+      .side-column {
+        display: none;
+      }
+
+      .meme-strip-shell {
+        display: block;
+      }
+
+      .container {
+        max-width: 95%;
+      }
+
+      header h1 {
+        font-size: 2rem;
+      }
+
+      header img.bear-gif {
+        width: 52px;
+        height: 52px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <!-- DESKTOP/TABLET: vertical deep-pink sections with cute cat memes -->
+    <div class="side-column left">
+      <div class="side-section">
+        <div class="scroll-viewport">
+          <div class="scroll-track">
+            <div class="meme">
+              <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Typing cat" />
+            </div>
+            <div class="meme">
+              <img src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif" alt="Sleepy kitten" />
+            </div>
+            <div class="meme">
+              <img src="https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif" alt="Cat head tilt" />
+            </div>
+            <div class="meme">
+              <img src="https://media.giphy.com/media/MCfhrrNN1goH6/giphy.gif" alt="Kitten playing" />
+            </div>
+            <div class="meme" aria-hidden="true">
+              <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="" />
+            </div>
+            <div class="meme" aria-hidden="true">
+              <img src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif" alt="" />
+            </div>
+            <div class="meme" aria-hidden="true">
+              <img src="https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif" alt="" />
+            </div>
+            <div class="meme" aria-hidden="true">
+              <img src="https://media.giphy.com/media/MCfhrrNN1goH6/giphy.gif" alt="" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-column right">
+      <div class="side-section">
+        <div class="scroll-viewport">
+          <div class="scroll-track reverse">
+            <div class="meme">
+              <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif" alt="Surprised cat zoom" />
+            </div>
+            <div class="meme">
+              <img src="https://media.giphy.com/media/12PA1eI8FBqEBa/giphy.gif" alt="Cat pawing screen" />
+            </div>
+            <div class="meme">
+              <img src="https://media.giphy.com/media/10dU7AN7xsi1I4/giphy.gif" alt="Rolling kitten" />
+            </div>
+            <div class="meme">
+              <img src="https://media.giphy.com/media/3oriOiizS4Pmofj46A/giphy.gif" alt="Box kitty" />
+            </div>
+            <div class="meme" aria-hidden="true">
+              <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif" alt="" />
+            </div>
+            <div class="meme" aria-hidden="true">
+              <img src="https://media.giphy.com/media/12PA1eI8FBqEBa/giphy.gif" alt="" />
+            </div>
+            <div class="meme" aria-hidden="true">
+              <img src="https://media.giphy.com/media/10dU7AN7xsi1I4/giphy.gif" alt="" />
+            </div>
+            <div class="meme" aria-hidden="true">
+              <img src="https://media.giphy.com/media/3oriOiizS4Pmofj46A/giphy.gif" alt="" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOBILE: top & bottom deep-pink strips with cute cat memes -->
+    <div class="meme-strip-shell top">
+      <div class="meme-strip-section">
+        <div class="meme-strip top">
+          <div class="meme-strip-inner">
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Typing cat" />
+            </div>
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif" alt="Sleepy kitten" />
+            </div>
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif" alt="Cat head tilt" />
+            </div>
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/MCfhrrNN1goH6/giphy.gif" alt="Kitten playing" />
+            </div>
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="" />
+            </div>
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif" alt="" />
+            </div>
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif" alt="" />
+            </div>
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/MCfhrrNN1goH6/giphy.gif" alt="" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="meme-strip-shell bottom">
+      <div class="meme-strip-section">
+        <div class="meme-strip bottom">
+          <div class="meme-strip-inner">
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif" alt="Surprised cat zoom" />
+            </div>
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/12PA1eI8FBqEBa/giphy.gif" alt="Cat pawing screen" />
+            </div>
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/10dU7AN7xsi1I4/giphy.gif" alt="Rolling kitten" />
+            </div>
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/3oriOiizS4Pmofj46A/giphy.gif" alt="Box kitty" />
+            </div>
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif" alt="" />
+            </div>
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/12PA1eI8FBqEBa/giphy.gif" alt="" />
+            </div>
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/10dU7AN7xsi1I4/giphy.gif" alt="" />
+            </div>
+            <div class="meme-strip-item">
+              <img src="https://media.giphy.com/media/3oriOiizS4Pmofj46A/giphy.gif" alt="" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CARD -->
+    <main class="container">
+      <header>
+          <p class="subtitle">
+        </p>        <h3>Welcome to the Mood Bubble 🎀</h3>
+        <div class="bear-wrapper" id="bearWrapper">
+          <img
+            class="bear-gif"
+            src="https://media.giphy.com/media/3oEduSbSGpGaRX2Vri/giphy.gif"
+            alt="Cute waving bear"
+          />
+          <div class="meow-bubble" id="meowBubble">
+            meow!!
+          </div>
+        </div>
+      </header>
+
+      <p class="subtitle">
+        This is a tiny gift that I made for YOUUUU <3 💖✨
+      </p>
+
+      <div style="text-align: center;">
+        <a class="primary-btn" href="intext.html">
+          <span>Mood Bubble</span>
+        </a>
+      </div>
+
+      <p class="footer-note">
+        P.S. You’re doing better than you think. 💗
+      </p>
+    </main>
+  </div>
+
+  <script>
+    const bearWrapper = document.getElementById("bearWrapper");
+    const meowBubble = document.getElementById("meowBubble");
+    let meowTimeout = null;
+
+    bearWrapper.addEventListener("click", () => {
+      meowBubble.classList.remove("show");
+      void meowBubble.offsetWidth;
+      meowBubble.classList.add("show");
+      if (meowTimeout) clearTimeout(meowTimeout);
+      meowTimeout = setTimeout(() => {
+        meowBubble.classList.remove("show");
+      }, 900);
+    });
+  </script>
+</body>
+</html>
